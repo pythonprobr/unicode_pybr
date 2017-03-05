@@ -58,3 +58,18 @@ A função listar recebe um arquivo aberto com registros de `UnicodeData.txt` e 
   >>> texto = io.StringIO(linhas3Da43)
   >>> listar(texto, 'MARK') # doctest:+NORMALIZE_WHITESPACE
   U+003F ? QUESTION MARK
+
+Uma consulta com dois resultados:
+
+  >>> texto = io.StringIO(linhas3Da43)
+  >>> listar(texto, 'SIGN') # doctest:+NORMALIZE_WHITESPACE
+  U+003D = EQUALS SIGN
+  U+003E > GREATER-THAN SIGN
+
+Consulta com duas palavras:
+
+>>> texto = io.StringIO(linhas3Da43)
+>>> listar(texto, 'CAPITAL LATIN') # doctest:+NORMALIZE_WHITESPACE
+  U+0041 A LATIN CAPITAL LETTER A
+  U+0042 B LATIN CAPITAL LETTER B
+  U+0043 C LATIN CAPITAL LETTER C

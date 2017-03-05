@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+import os, sys, threading
+import urllib.request
+
+# URL_UCD é a URL canônica do arquivo UnicodeData.txt mais atual
+URL_UCD = 'http://www.unicode.org/Public/UNIDATA/UnicodeData.txt'
+
+
 def analisar_linha(linha):
     campos = linha.split(';')
     código = int(campos[0], 16)
@@ -16,4 +23,55 @@ def listar(texto, consulta):
     for linha in texto:
         runa, nome, palavras_nome = analisar_linha(linha)
         if consulta <= palavras_nome:
-            print('U+{:04X}\t{}\t{}'.format(ord(runa), runa, nome))
+            try:
+                print('U+{:04X}\t{}\t{}'.format(ord(runa), runa, nome))
+            except UnicodeEncodeError:
+                print('U+{:04X}\t\t{}'.format(ord(runa), nome))
+
+
+
+def obter_caminho_UCD():
+    caminho_UCD = os.environ.get('UCD_PATH')
+    if caminho_UCD is None:
+        caminho_UCD = os.path.join(os.environ['HOME'], "UnicodeData.txt")
+    return caminho_UCD
+
+
+def abrir_UCD(caminho):
+    try:
+        ucd = open(caminho)
+    except FileNotFoundError:
+        print('%s não encontrado\nbaixando %s' % (caminho, URL_UCD))
+        feito = threading.Event()
+        prog = threading.Thread(target=progresso, args=(feito,))
+        prog.start()
+        baixar_UCD(URL_UCD, caminho)
+        feito.set()
+        prog.join()
+        ucd = open(caminho)
+    return ucd
+
+
+def baixar_UCD(url, caminho):
+    with urllib.request.urlopen(url) as resposta:
+        octetos = resposta.read()
+    with open(caminho, 'wb') as arquivo:
+        arquivo.write(octetos)
+
+
+def progresso(feito):
+    while True:
+        if feito.wait(.150):
+            break
+        print('.', end='')
+        sys.stdout.flush()
+    print()
+
+
+def main():
+    with abrir_UCD(obter_caminho_UCD()) as ucd:
+        consulta = ' '.join(sys.argv[1:])
+        listar(ucd, consulta.upper())
+
+if __name__ == '__main__':
+    main()
