@@ -26,7 +26,7 @@ def listar(texto, consulta):
             try:
                 print('U+{:04X}\t{}\t{}'.format(ord(runa), runa, nome))
             except UnicodeEncodeError:
-                print('U+{:04X}\t\t{}'.format(ord(runa), nome))
+                print('U+{:04X}\t\uFFFD\t{}'.format(ord(runa), nome))
 
 
 def obter_caminho_UCD():
@@ -60,8 +60,7 @@ def baixar_UCD(url, caminho):
 
 def progresso(feito):
     while not feito.wait(.150):
-        print('.', end='')
-        sys.stdout.flush()
+        print('.', end='', flush=True)
     print()
 
 
