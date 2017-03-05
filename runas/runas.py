@@ -29,7 +29,6 @@ def listar(texto, consulta):
                 print('U+{:04X}\t\t{}'.format(ord(runa), nome))
 
 
-
 def obter_caminho_UCD():
     caminho_UCD = os.environ.get('UCD_PATH')
     if caminho_UCD is None:
@@ -60,9 +59,7 @@ def baixar_UCD(url, caminho):
 
 
 def progresso(feito):
-    while True:
-        if feito.wait(.150):
-            break
+    while not feito.wait(.150):
         print('.', end='')
         sys.stdout.flush()
     print()
@@ -72,6 +69,7 @@ def main():
     with abrir_UCD(obter_caminho_UCD()) as ucd:
         consulta = ' '.join(sys.argv[1:])
         listar(ucd, consulta.upper())
+
 
 if __name__ == '__main__':
     main()
